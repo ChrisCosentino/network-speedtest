@@ -1,5 +1,7 @@
 'use client';
 
+import SpeedTest from '@cloudflare/speedtest';
+
 export default function Home() {
 	const sendPostMessage = (message) => {
 		// Check if we're running in a WebView environment
