@@ -84,7 +84,7 @@
 import React from 'react';
 
 export const Gauge = ({
-	value,
+	value = 0,
 	size = 'small',
 	showValue = true,
 	color = 'text-[hsla(131,41%,46%,1)]',
@@ -144,7 +144,7 @@ export const Gauge = ({
 			</svg>
 			{showValue && (
 				<div className='absolute flex opacity-0 animate-gauge_fadeIn'>
-					<p className={sizes[size].textSize}>{value} mb</p>
+					<p className={sizes[size].textSize}>{value || 0} mb</p>
 				</div>
 			)}
 		</div>
