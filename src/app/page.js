@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import {
 	DownloadIcon,
+	HelpCircle,
 	Loader2Icon,
 	PlayIcon,
 	SaveIcon,
@@ -10,20 +11,53 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import SpeedTest from '@cloudflare/speedtest';
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gauge } from '@/components/ui/gauge';
 import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from '@/components/ui/accordion';
+	PopoverContent,
+	PopoverTrigger,
+	Popover,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+
+const MetricCard = ({ title, downloadValue, uploadValue, helpText }) => {
+	return (
+		<Card className='w-full'>
+			<CardHeader className='flex flex-row items-center space-y-0'>
+				<CardTitle>{title}</CardTitle>
+				<Popover>
+					<PopoverTrigger>
+						<Button size='icon' variant='ghost'>
+							<HelpCircle size={16} className='opacity-60' strokeWidth={2} />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent>{helpText}</PopoverContent>
+				</Popover>
+			</CardHeader>
+			<CardContent className='grid grid-cols-2 gap-4'>
+				<div className='flex flex-col items-center space-y-2'>
+					<Gauge
+						value={downloadValue}
+						size='large'
+						showValue={true}
+						maxValue={100}
+					/>
+					<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+						<DownloadIcon size={14} />
+						<span>Download</span>
+					</div>
+				</div>
+				<div className='flex flex-col items-center space-y-2'>
+					<Gauge value={uploadValue} size='large' showValue={true} maxValue={100} />
+					<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+						<UploadIcon size={14} />
+						<span>Upload</span>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+};
 
 export default function Home() {
 	const [ranFirstTest, setRanFirstTest] = useState(false);
@@ -160,12 +194,6 @@ export default function Home() {
 		st.onFinish = (results) => {
 			setFinalResults(updateFinalResults(results));
 		};
-		// st.onResultsChange = () => updateResults(st.results);
-		// st.onFinish = (results) => {
-		// 	console.log({ results });
-		// 	// updateResults(results);
-		// 	setIsRunning(false);
-		// };
 
 		st.onError = (error) => console.error('Speed test error:', error);
 
@@ -275,7 +303,7 @@ export default function Home() {
 				</CardContent>
 			</Card>
 
-			<Card>
+			<Card className={cn('animate-pulse')}>
 				<CardHeader>
 					<CardTitle>Upload (mbps)</CardTitle>
 				</CardHeader>
@@ -288,97 +316,18 @@ export default function Home() {
 				</CardContent>
 			</Card>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>Latency (mbps)</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className='flex justify-center items-center space-x-8'>
-						<div className='flex flex-col items-start'>
-							<div className='text-4xl font-bold'>
-								{(shownResults?.downloadedLatency || 0)?.toFixed(2)}
-							</div>
-							<div className='flex space-x-2 items-center'>
-								Download
-								<DownloadIcon
-									className='-ms-1 me-2 opacity-60 ml-2'
-									size={16}
-									strokeWidth={2}
-									aria-hidden='true'
-								/>
-							</div>
-						</div>
-						<div className='flex flex-col items-start'>
-							<div className='text-4xl font-bold'>
-								{(shownResults?.uploadedLatency || 0)?.toFixed(2)}
-							</div>
-							<div className='flex space-x-2 items-center'>
-								Upload
-								<UploadIcon
-									className='-ms-1 me-2 opacity-60 ml-2'
-									size={16}
-									strokeWidth={2}
-									aria-hidden='true'
-								/>
-							</div>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Jitter</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className='flex justify-center items-center space-x-8'>
-						<div className='flex flex-col items-start'>
-							<div className='text-4xl font-bold'>
-								{(shownResults?.downloadedJitter || 0)?.toFixed(2)}
-							</div>
-							<div className='flex space-x-2 items-center'>
-								Download
-								<DownloadIcon
-									className='-ms-1 me-2 opacity-60 ml-2'
-									size={16}
-									strokeWidth={2}
-									aria-hidden='true'
-								/>
-							</div>
-						</div>
-						<div className='flex flex-col items-start'>
-							<div className='text-4xl font-bold'>
-								{(shownResults?.uploadedJitter || 0)?.toFixed(2)}
-							</div>
-							<div className='flex space-x-2 items-center'>
-								Upload
-								<UploadIcon
-									className='-ms-1 me-2 opacity-60 ml-2'
-									size={16}
-									strokeWidth={2}
-									aria-hidden='true'
-								/>
-							</div>
-						</div>
-					</div>
-				</CardContent>
-				{/* <CardFooter>
-					<Accordion className='w-full' type='single' collapsible>
-						<AccordionItem value='item-1'>
-							<AccordionTrigger>Is it accessible?</AccordionTrigger>
-							<AccordionContent>
-								Yes. It adheres to the WAI-ARIA design pattern.
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem value='item-2'>
-							<AccordionTrigger>Is it accessible?</AccordionTrigger>
-							<AccordionContent>
-								Yes. It adheres to the WAI-ARIA design pattern.
-							</AccordionContent>
-						</AccordionItem>
-					</Accordion>
-				</CardFooter> */}
-			</Card>
+			<MetricCard
+				title='Latency (ms)'
+				downloadValue={(shownResults?.downloadedLatency || 0)?.toFixed(2)}
+				uploadValue={(shownResults?.uploadedLatency || 0)?.toFixed(2)}
+				helpText='Latency is the time it takes for data to travel from your device to the speed test servers and back. Lower values mean more responsive connections. Under 50ms is excellent, 50-100ms is good, and over 100ms may cause noticeable delays.'
+			/>
+			<MetricCard
+				title='Jitter (ms)'
+				downloadValue={(shownResults?.downloadedJitter || 0)?.toFixed(2)}
+				uploadValue={(shownResults?.uploadedJitter || 0)?.toFixed(2)}
+				helpText='Jitter measures the variation in latency over time. Lower jitter means a more stable connection. Under 10ms is excellent, 10-20ms is good, and over 20ms may cause inconsistent performance in real-time applications.'
+			/>
 		</div>
 	);
 }

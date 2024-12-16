@@ -82,6 +82,7 @@
 // };
 
 import React from 'react';
+import { NumberTicker } from './number-ticker';
 
 export const Gauge = ({
 	value = 0,
@@ -144,7 +145,10 @@ export const Gauge = ({
 			</svg>
 			{showValue && (
 				<div className='absolute flex opacity-0 animate-gauge_fadeIn'>
-					<p className={sizes[size].textSize}>{value || 0} mb</p>
+					<p className={sizes[size].textSize}>
+						<NumberTicker value={value || 0} />
+					</p>
+					{/* <p className={sizes[size].textSize}>{value || 0} mb</p> */}
 				</div>
 			)}
 		</div>
