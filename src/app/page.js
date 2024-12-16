@@ -183,6 +183,7 @@ export default function Home() {
 			// 	{ type: 'upload', bytes: 1e6, count: 20 },
 			// 	{ type: 'packetLoss', numPackets: 1e3, responsesWaitTime: 3000 },
 			// ],
+			//
 		});
 
 		setSpeedTest(st);
