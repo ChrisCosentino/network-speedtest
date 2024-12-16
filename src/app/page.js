@@ -20,9 +20,21 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-const MetricCard = ({ title, downloadValue, uploadValue, helpText }) => {
+const MetricCard = ({
+	title,
+	downloadValue,
+	uploadValue,
+	helpText,
+	isRunning = false,
+	type,
+}) => {
 	return (
-		<Card className='w-full'>
+		<Card
+			className={cn(
+				'relative w-full',
+				isRunning &&
+					'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
+			)}>
 			<CardHeader className='flex flex-row items-center space-y-0'>
 				<CardTitle>{title}</CardTitle>
 				<Popover>
@@ -41,6 +53,7 @@ const MetricCard = ({ title, downloadValue, uploadValue, helpText }) => {
 						size='large'
 						showValue={true}
 						maxValue={100}
+						type={type}
 					/>
 					<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
 						<DownloadIcon size={14} />
@@ -48,7 +61,13 @@ const MetricCard = ({ title, downloadValue, uploadValue, helpText }) => {
 					</div>
 				</div>
 				<div className='flex flex-col items-center space-y-2'>
-					<Gauge value={uploadValue} size='large' showValue={true} maxValue={100} />
+					<Gauge
+						value={uploadValue}
+						size='large'
+						showValue={true}
+						maxValue={100}
+						type={type}
+					/>
 					<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
 						<UploadIcon size={14} />
 						<span>Upload</span>
@@ -235,8 +254,6 @@ export default function Home() {
 		);
 	}
 
-	console.log({ results, finalResults });
-
 	const shownResults = finalResults || results || null;
 
 	const handleSaveResults = () => {
@@ -290,7 +307,12 @@ export default function Home() {
 				</Button>
 			</div>
 
-			<Card>
+			<Card
+				className={cn(
+					'relative',
+					isRunning &&
+						'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
+				)}>
 				<CardHeader>
 					<CardTitle>Download (mbps)</CardTitle>
 				</CardHeader>
@@ -299,11 +321,17 @@ export default function Home() {
 						value={((shownResults?.download || 0) / 1000000).toFixed(2) || 0}
 						size='extraLarge'
 						showValue={true}
+						type='download'
 					/>
 				</CardContent>
 			</Card>
 
-			<Card className={cn('animate-pulse')}>
+			<Card
+				className={cn(
+					'relative',
+					isRunning &&
+						'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
+				)}>
 				<CardHeader>
 					<CardTitle>Upload (mbps)</CardTitle>
 				</CardHeader>
@@ -312,6 +340,7 @@ export default function Home() {
 						value={((shownResults?.upload || 0) / 1000000).toFixed(2)}
 						size='extraLarge'
 						showValue={true}
+						type='upload'
 					/>
 				</CardContent>
 			</Card>
@@ -321,12 +350,16 @@ export default function Home() {
 				downloadValue={(shownResults?.downloadedLatency || 0)?.toFixed(2)}
 				uploadValue={(shownResults?.uploadedLatency || 0)?.toFixed(2)}
 				helpText='Latency is the time it takes for data to travel from your device to the speed test servers and back. Lower values mean more responsive connections. Under 50ms is excellent, 50-100ms is good, and over 100ms may cause noticeable delays.'
+				isRunning={isRunning}
+				type='latency'
 			/>
 			<MetricCard
 				title='Jitter (ms)'
 				downloadValue={(shownResults?.downloadedJitter || 0)?.toFixed(2)}
 				uploadValue={(shownResults?.uploadedJitter || 0)?.toFixed(2)}
 				helpText='Jitter measures the variation in latency over time. Lower jitter means a more stable connection. Under 10ms is excellent, 10-20ms is good, and over 20ms may cause inconsistent performance in real-time applications.'
+				isRunning={isRunning}
+				type='jitter'
 			/>
 		</div>
 	);
