@@ -263,9 +263,9 @@ export default function Home() {
 	};
 
 	return (
-		<div className='flex-col space-y-8 pb-16 pt-8 max-w-lg mx-auto px-8'>
+		<div className='flex-col space-y-4 pb-16 pt-8 max-w-lg mx-auto px-8'>
 			<div className='flex-col flex space-y-4'>
-				{finalResults && (
+				{/* {finalResults && (
 					<Button
 						variant='outline'
 						className='font-bold w-full'
@@ -278,7 +278,7 @@ export default function Home() {
 						/>
 						Save Results
 					</Button>
-				)}
+				)} */}
 
 				<Button
 					className='font-bold w-full'
@@ -308,43 +308,45 @@ export default function Home() {
 				</Button>
 			</div>
 
-			<Card
-				className={cn(
-					'relative',
-					isRunning &&
-						'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
-				)}>
-				<CardHeader>
-					<CardTitle>Download (mbps)</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Gauge
-						value={((shownResults?.download || 0) / 1000000).toFixed(2) || 0}
-						size='extraLarge'
-						showValue={true}
-						type='download'
-					/>
-				</CardContent>
-			</Card>
+			<div className='grid grid-cols-2 gap-4'>
+				<Card
+					className={cn(
+						'relative',
+						isRunning &&
+							'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
+					)}>
+					<CardHeader>
+						<CardTitle>Download (mbps)</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Gauge
+							value={((shownResults?.download || 0) / 1000000).toFixed(2) || 0}
+							size='large'
+							showValue={true}
+							type='download'
+						/>
+					</CardContent>
+				</Card>
 
-			<Card
-				className={cn(
-					'relative',
-					isRunning &&
-						'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
-				)}>
-				<CardHeader>
-					<CardTitle>Upload (mbps)</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Gauge
-						value={((shownResults?.upload || 0) / 1000000).toFixed(2)}
-						size='extraLarge'
-						showValue={true}
-						type='upload'
-					/>
-				</CardContent>
-			</Card>
+				<Card
+					className={cn(
+						'relative',
+						isRunning &&
+							'before:absolute before:inset-0 before:rounded-xl before:border-4 before:border-primary/50 before:animate-pulse'
+					)}>
+					<CardHeader>
+						<CardTitle>Upload (mbps)</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Gauge
+							value={((shownResults?.upload || 0) / 1000000).toFixed(2)}
+							size='large'
+							showValue={true}
+							type='upload'
+						/>
+					</CardContent>
+				</Card>
+			</div>
 
 			<MetricCard
 				title='Latency (ms)'
