@@ -19,6 +19,7 @@ import {
 	Popover,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { sendPostMessage } from '@/utils/send-post-message';
 
 const MetricCard = ({
 	title,
@@ -212,6 +213,10 @@ export default function Home() {
 			setResults(updateResults(st.results));
 		};
 		st.onFinish = (results) => {
+			console.log('results', results);
+			sendPostMessage(JSON.stringify(results));
+
+			console.log('results sent', results);
 			setFinalResults(updateFinalResults(results));
 		};
 
@@ -255,7 +260,7 @@ export default function Home() {
 		);
 	}
 
-	const shownResults = finalResults || results || null;
+	const shownResults = finalResults || results || 0;
 
 	const handleSaveResults = () => {
 		// send the postMessage to rnwebview
@@ -263,7 +268,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className='flex-col space-y-4 pb-16 pt-8 max-w-lg mx-auto px-8'>
+		<div className='flex-col space-y-4 pb-16 pt-8 max-w-lg mx-auto px-4'>
 			<div className='flex-col flex space-y-4'>
 				{/* {finalResults && (
 					<Button
