@@ -6,6 +6,7 @@ interface GaugeChartProps {
   showValue?: boolean;
   size: number;
   gap: number;
+  displayValue?: string | number;
   progress: number;
   trackClassName?: string;
   progressClassName?: string;
@@ -21,6 +22,7 @@ export function GaugeChart({
   size,
   progress,
   gap,
+  displayValue,
   progressClassName = "text-green-500",
   trackClassName = "text-black/10 dark:text-white/10",
   circleWidth = 16,
@@ -98,7 +100,7 @@ export function GaugeChart({
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono font-bold text-foreground"
             style={{ fontSize: size / 4 }}
           >
-            {progress}
+            {displayValue !== undefined ? displayValue : progress}
           </div>
         )}
         {children}

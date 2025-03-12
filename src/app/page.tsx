@@ -57,7 +57,7 @@ export default function Home() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Download & Upload</CardTitle>
+              <CardTitle>Download & Upload (Mbps)</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -75,6 +75,7 @@ export default function Home() {
                       rounded
                       showValue
                       size={100}
+                      displayValue={bandwidth.mbps}
                       progressClassName={cn(
                         bandwidth.color === "red" && "text-red-500",
                         bandwidth.color === "yellow" && "text-yellow-500",
@@ -106,6 +107,7 @@ export default function Home() {
                       progressWidth={10}
                       rounded
                       showValue
+                      displayValue={latency.ms}
                       size={100}
                       progressClassName={cn(
                         latency.color === "red" && "text-red-500",
@@ -139,6 +141,7 @@ export default function Home() {
                       rounded
                       showValue
                       size={100}
+                      displayValue={jitter.ms}
                       progressClassName={cn(
                         jitter.color === "red" && "text-red-500",
                         jitter.color === "yellow" && "text-yellow-500",

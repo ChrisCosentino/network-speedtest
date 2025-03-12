@@ -26,26 +26,26 @@ import { sendPostMessage } from "@/lib/send-post-message";
 //   scores?: any;
 // }
 
-const updateFinalResults = (results: any) => {
+const updateFinalResults = (res: any) => {
   return {
-    download: results.getDownloadBandwidth(),
-    upload: results.getUploadBandwidth(),
-    unloadedLatency: results.getUnloadedLatency(),
-    unloadedJitter: results.getUnloadedJitter(),
-    unloadedLatencyPoints: results.getUnloadedLatencyPoints(),
-    downloadedLatency: results.getDownLoadedLatency(),
-    downloadedJitter: results.getDownLoadedJitter(),
-    downloadedLatencyPoints: results?.getDownLoadedLatencyPoints(),
-    uploadedLatency: results.getUpLoadedLatency(),
-    uploadedJitter: results.getUpLoadedJitter(),
-    uploadedLatencyPoints: results.getUpLoadedLatencyPoints(),
-    downloadBandwidth: results.getDownloadBandwidth(),
-    downloadBandwidthPoints: results.getDownloadBandwidthPoints(),
-    uploadBandwidth: results.getUploadBandwidth(),
-    uploadBandwidthPoints: results.getUploadBandwidthPoints(),
-    packetLoss: results.getPacketLoss(),
-    packetLossDetails: results.getPacketLossDetails(),
-    scores: results.getScores(),
+    download: res.getDownloadBandwidth(),
+    upload: res.getUploadBandwidth(),
+    unloadedLatency: res.getUnloadedLatency(),
+    unloadedJitter: res.getUnloadedJitter(),
+    unloadedLatencyPoints: res.getUnloadedLatencyPoints(),
+    downloadedLatency: res.getDownLoadedLatency(),
+    downloadedJitter: res.getDownLoadedJitter(),
+    downloadedLatencyPoints: res?.getDownLoadedLatencyPoints(),
+    uploadedLatency: res.getUpLoadedLatency(),
+    uploadedJitter: res.getUpLoadedJitter(),
+    uploadedLatencyPoints: res.getUpLoadedLatencyPoints(),
+    downloadBandwidth: res.getDownloadBandwidth(),
+    downloadBandwidthPoints: res.getDownloadBandwidthPoints(),
+    uploadBandwidth: res.getUploadBandwidth(),
+    uploadBandwidthPoints: res.getUploadBandwidthPoints(),
+    packetLoss: res.getPacketLoss(),
+    packetLossDetails: res.getPacketLossDetails(),
+    scores: res.getScores(),
   };
 };
 
@@ -110,14 +110,19 @@ export function useSpeedTest() {
       }
     };
 
-    st.onFinish = (results) => {
-      sendPostMessage(JSON.stringify(results));
+    // st.onResultsChange = () => {
+    // 	setResults(updateResults(st.results));
+    // };
 
-      // progress
+    st.onFinish = (res: any) => {
+      const result = updateFinalResults(res);
+
+      setResults(result);
+
       setProgress(100);
       stopProgressTimer();
 
-      setResults(updateFinalResults(results));
+      sendPostMessage(result);
     };
 
     st.onError = (error) => {
@@ -172,8 +177,6 @@ export function useSpeedTest() {
     const downloadMbps = downloadBytes / 1_000_000;
     const uploadMbps = uploadBytes / 1_000_000;
 
-    console.log({ downloadMbps, uploadMbps });
-
     const maxExpectedMbps = 100;
     const normalizedDownload = Math.min(
       Math.round((downloadMbps / maxExpectedMbps) * 100),
@@ -194,14 +197,14 @@ export function useSpeedTest() {
       {
         value: normalizedDownload,
         color: getSpeedColor(normalizedDownload),
-        mbps: downloadMbps.toFixed(1),
+        mbps: Math.round(downloadMbps),
         key: "download",
         title: "Download",
       },
       {
         value: normalizedUpload,
         color: getSpeedColor(normalizedUpload),
-        mbps: uploadMbps.toFixed(1),
+        mbps: Math.round(uploadMbps),
         key: "upload",
         title: "Upload",
       },
@@ -209,7 +212,6 @@ export function useSpeedTest() {
   }, [results]);
 
   const formattedLatency = useMemo(() => {
-    console.log({ results });
     if (!results)
       return [
         { value: 0, color: "gray", mbps: "0" },
@@ -240,14 +242,14 @@ export function useSpeedTest() {
       {
         value: normalizedDownload,
         color: getLatencyColor(downloadLatency),
-        ms: downloadLatency.toFixed(1),
+        ms: Math.round(downloadLatency),
         key: "downloadLatency",
         title: "Download",
       },
       {
         value: normalizedUpload,
         color: getLatencyColor(uploadLatency),
-        ms: uploadLatency.toFixed(1),
+        ms: Math.round(uploadLatency),
         key: "uploadLatency",
         title: "Upload",
       },
@@ -255,7 +257,6 @@ export function useSpeedTest() {
   }, [results]);
 
   const formattedJitter = useMemo(() => {
-    console.log({ results });
     if (!results)
       return [
         { value: 0, color: "gray", ms: "0" },
@@ -288,14 +289,14 @@ export function useSpeedTest() {
       {
         value: normalizedDownload,
         color: getJitterColor(downloadJitter),
-        ms: downloadJitter.toFixed(1),
+        ms: Math.round(downloadJitter),
         key: "downloadJitter",
         title: "Download",
       },
       {
         value: normalizedUpload,
         color: getJitterColor(uploadJitter),
-        ms: uploadJitter.toFixed(1),
+        ms: Math.round(uploadJitter),
         key: "uploadJitter",
         title: "Upload",
       },
