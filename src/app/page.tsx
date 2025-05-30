@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { GaugeChart } from "@/components/ui/charts/gauge";
 import { Progress } from "@/components/ui/charts/progress";
 import { useSpeedTest } from "@/hooks/use-speed-test";
 import { cn } from "@/lib/utils";
+import { FormattedStat } from "@/types";
 
 export default function Home() {
   const {
@@ -62,7 +62,7 @@ export default function Home() {
 
             <CardContent>
               <div className="flex ">
-                {formattedBandwidth?.map((bandwidth: any) => (
+                {formattedBandwidth?.map((bandwidth: FormattedStat) => (
                   <div
                     className="flex flex-col items-center flex-1"
                     key={bandwidth.key}
@@ -95,7 +95,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex">
-                {formattedLatency?.map((latency: any) => (
+                {formattedLatency?.map((latency: FormattedStat) => (
                   <div
                     key={latency?.key}
                     className="flex flex-col items-center flex-1"
@@ -128,7 +128,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex">
-                {formattedJitter?.map((jitter: any) => (
+                {formattedJitter?.map((jitter: FormattedStat) => (
                   <div
                     key={jitter?.key}
                     className="flex flex-col items-center flex-1"

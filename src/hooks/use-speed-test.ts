@@ -1,32 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useEffect, useMemo, useState } from "react";
 
-import SpeedTestEngine from "@cloudflare/speedtest";
+import SpeedTestEngine, { Results } from "@cloudflare/speedtest";
 import { sendPostMessage } from "@/lib/send-post-message";
+import { FormattedStat, SpeedTestResults } from "@/types";
 
-// interface SpeedTestResults {
-//   download?: number;
-//   upload?: number;
-//   downloadedJitter?: number;
-//   uploadedJitter?: number;
-//   downloadedLatency?: number;
-//   uploadedLatency?: number;
-//   packetLoss?: number;
-//   packetLossDetails?: any;
-//   unloadedLatency?: number;
-//   unloadedJitter?: number;
-//   unloadedLatencyPoints?: any[];
-//   downloadedLatencyPoints?: any[];
-//   uploadedLatencyPoints?: any[];
-//   downloadBandwidth?: number;
-//   downloadBandwidthPoints?: any[];
-//   uploadBandwidth?: number;
-//   uploadBandwidthPoints?: any[];
-//   scores?: any;
-// }
-
-const updateFinalResults = (res: any) => {
+const updateFinalResults = (res: Results): SpeedTestResults => {
   return {
     download: res.getDownloadBandwidth(),
     upload: res.getUploadBandwidth(),
@@ -52,7 +32,7 @@ const updateFinalResults = (res: any) => {
 export function useSpeedTest() {
   const [speedTest, setSpeedTest] = useState<SpeedTestEngine | null>(null);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<SpeedTestResults | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [progressInterval, setProgressInterval] =
     useState<NodeJS.Timeout | null>(null);
@@ -66,13 +46,22 @@ export function useSpeedTest() {
     // Reset progress
     setProgress(0);
 
-    // Create new interval that increments progress by 1 every second
     const interval = setInterval(() => {
       setProgress((prev) => {
-        // Cap at 99% until the test is complete
-        return prev < 95 ? prev + 3 : prev;
+        if (prev < 30) {
+          // Initial phase (latency tests) - faster progress
+          return prev + 5;
+        } else if (prev < 60) {
+          // Mid phase (small download/upload tests) - medium progress
+          return prev + 3;
+        } else if (prev < 90) {
+          // Final phase (large download/upload tests) - slower progress
+          return prev + 1;
+        }
+        // Cap at 95% until the test is complete
+        return Math.min(prev + 0.5, 95);
       });
-    }, 1000);
+    }, 200);
 
     setProgressInterval(interval);
   };
@@ -87,15 +76,30 @@ export function useSpeedTest() {
   useEffect(() => {
     const st = new SpeedTestEngine({
       autoStart: false,
-      // measurements: [
-      // 	{ type: 'latency', numPackets: 20 },
-      // 	{ type: 'download', bytes: 1e5, count: 5 },
-      // 	{ type: 'upload', bytes: 1e5, count: 5 },
-      // 	{ type: 'download', bytes: 1e6, count: 20 },
-      // 	{ type: 'upload', bytes: 1e6, count: 20 },
-      // 	{ type: 'packetLoss', numPackets: 1e3, responsesWaitTime: 3000 },
-      // ],
-      //
+      measurements: [
+        // unloaded latency + jitter
+        { type: "latency", numPackets: 5 },
+
+        // Small download/upload for low-speed environments
+        { type: "download", bytes: 1e5, count: 1 },
+        { type: "upload", bytes: 1e5, count: 1 },
+
+        // Mid-size warmup
+        { type: "download", bytes: 1e6, count: 1 },
+        { type: "upload", bytes: 1e6, count: 1 },
+
+        // Large-size bandwidth
+        { type: "download", bytes: 5e7, count: 1 },
+        { type: "upload", bytes: 5e7, count: 1 },
+
+        // Optional but still quick packet loss
+        { type: "packetLoss", numPackets: 100, responsesWaitTime: 500 },
+      ],
+
+      bandwidthMinRequestDuration: 100,
+      loadedLatencyThrottle: 300,
+      measureDownloadLoadedLatency: true,
+      measureUploadLoadedLatency: true,
     });
 
     setSpeedTest(st);
@@ -110,11 +114,7 @@ export function useSpeedTest() {
       }
     };
 
-    // st.onResultsChange = () => {
-    // 	setResults(updateResults(st.results));
-    // };
-
-    st.onFinish = (res: any) => {
+    st.onFinish = (res: Results) => {
       const result = updateFinalResults(res);
 
       setResults(result);
@@ -164,7 +164,7 @@ export function useSpeedTest() {
     }
   };
 
-  const formattedBandwidth = useMemo(() => {
+  const formattedBandwidth: FormattedStat[] = useMemo(() => {
     if (!results)
       return [
         { value: 0, color: "gray", mbps: "0" },
@@ -211,7 +211,7 @@ export function useSpeedTest() {
     ];
   }, [results]);
 
-  const formattedLatency = useMemo(() => {
+  const formattedLatency: FormattedStat[] = useMemo(() => {
     if (!results)
       return [
         { value: 0, color: "gray", mbps: "0" },
@@ -256,7 +256,7 @@ export function useSpeedTest() {
     ];
   }, [results]);
 
-  const formattedJitter = useMemo(() => {
+  const formattedJitter: FormattedStat[] = useMemo(() => {
     if (!results)
       return [
         { value: 0, color: "gray", ms: "0" },
