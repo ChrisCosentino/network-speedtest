@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import SpeedTestEngine, { Results } from "@cloudflare/speedtest";
 import { sendPostMessage } from "@/lib/send-post-message";
@@ -34,13 +34,12 @@ export function useSpeedTest() {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [results, setResults] = useState<SpeedTestResults | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [progressInterval, setProgressInterval] =
-    useState<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startProgressTimer = () => {
     // Clear any existing interval first
-    if (progressInterval) {
-      clearInterval(progressInterval);
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
     }
 
     // Reset progress
@@ -63,13 +62,13 @@ export function useSpeedTest() {
       });
     }, 200);
 
-    setProgressInterval(interval);
+    progressIntervalRef.current = interval;
   };
 
   const stopProgressTimer = () => {
-    if (progressInterval) {
-      clearInterval(progressInterval);
-      setProgressInterval(null);
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
     }
   };
 

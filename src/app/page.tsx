@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/charts/progress";
 import { useSpeedTest } from "@/hooks/use-speed-test";
 import { cn } from "@/lib/utils";
 import { FormattedStat } from "@/types";
+import { Loader2Icon } from "lucide-react";
 
 export default function Home() {
   const {
@@ -26,8 +27,12 @@ export default function Home() {
         <div className="rounded-lg bg-primary p-8 max-w-lg mx-auto mt-8 mx-8">
           <div className="flex flex-col space-y-2 text-gray-50">
             <h1 className="text-gray-50">Running Speed Test</h1>
-            <span>
-              <strong>{progress}%</strong> progress
+            <span className="flex space-x-2">
+              <strong className="w-9">{progress}%</strong>
+              <span className="flex items-center">
+                progress
+                <Loader2Icon size={16} className="ml-1 animate-spin" />
+              </span>
             </span>
           </div>
           <div className="h-[12px] w-full pt-3">
